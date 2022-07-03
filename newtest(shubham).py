@@ -13,7 +13,7 @@ from datetime import date, timedelta, datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 
-#MongoDB Part
+#------------------------------------------MongoDB Part----------------------------------------------------------------------------------------------------
 cluster = MongoClient("mongodb+srv://Shub:ydaFUqp90RymHLw9@cluster0.ceaym1j.mongodb.net/?retryWrites=true&w=majority")
 db = cluster["test"]
 collection = db["test"]
@@ -88,6 +88,7 @@ def dataViz():
 
 dataViz()
 
+#------------------------------------------Driver Code----------------------------------------------------------------------------------------------------
 #calculating eye aspect ratio
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the vertical
@@ -120,7 +121,7 @@ def sound_alarm(alarm_file):
 camera = cv2.VideoCapture(0)
 predictor_path = 'C:/Users/shubh/OneDrive/Desktop/Codes/Mini-Project-sem-2-main/Mini-Project-sem-2-main/shape_predictor_68_face_landmarks.dat'
 
-# define constants for aspect ratios
+# define constants for aspect ratios(Room for improvement in these values)
 EYE_AR_THRESH = 0.30
 EYE_AR_CONSEC_FRAMES = 48
 MOU_AR_THRESH = 0.78
@@ -241,8 +242,8 @@ while True:
 
 		cv2.putText(frame, "MAR: {:.2f}".format(mouEAR), (480, 60),
 			cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-		# cv2.putText(frame,"Lusip Project @ Swarnim",(370,470),cv2.FONT_HERSHEY_COMPLEX,0.6,(153,51,102),1)
-	# show the frame
+		
+	
 	cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
 
