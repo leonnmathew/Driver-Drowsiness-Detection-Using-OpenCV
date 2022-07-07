@@ -1,4 +1,5 @@
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
@@ -55,12 +56,26 @@ class AboutScreen(Screen): #AboutScreen subclass
         aboutPage.add_widget(name3)
 
         # Button widget
+        buttonSection = BoxLayout()
+        blank2 = Label(
+            font_size= 18,
+            size_hint=(0.4,0.3),
+            pos_hint = {"x" : 0.45, "top" : 0.9}
+            )
+        buttonSection.add_widget(blank2)
         button1 = Button(
             text="Go Back",
-            size_hint=(0.4,0.3),
+            size_hint=(0.4,0.4),
             on_press = self.callback
             )
-        aboutPage.add_widget(button1)
+        buttonSection.add_widget(button1)
+        blank3 = Label(
+            font_size= 18,
+            size_hint=(0.4,0.3),
+            pos_hint = {"x" : 0.45, "top" : 0.9}
+            )
+        buttonSection.add_widget(blank3)
+        aboutPage.add_widget(buttonSection)
         self.add_widget(aboutPage)
 
     def callback(self, instance):

@@ -34,7 +34,7 @@ class MainScreen(Screen): #mainScreen subclass
             text="Exit",
             size_hint=(0.2,0.07),
             pos_hint= {'center_x':0.5,'center_y':0.5},
-            background_color = '#00FFCE',
+            background_color = '#1663e0',
             on_press = self.callback
             )
         layout.add_widget(button1)
@@ -63,6 +63,7 @@ class MainScreen(Screen): #mainScreen subclass
 
     def callback(self, instance):
         self.manager.current = 'welcomeScreen'
+        
 
     #calculating eye aspect ratio
     def eye_aspect_ratio(self,eye):
@@ -157,8 +158,8 @@ class MainScreen(Screen): #mainScreen subclass
                     cv2.putText(gray, "DROWSINESS ALERT!", (10, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-                    if not ALARM_ON:
-                        ALARM_ON = True
+                    if not self.ALARM_ON:
+                        self.ALARM_ON = True
                         t = Thread(target=self.sound_alarm,
                                 args=('alarm.wav',))
                         t.deamon = True
@@ -171,7 +172,7 @@ class MainScreen(Screen): #mainScreen subclass
             else:
                 self.COUNTER = 0
                 cv2.putText(gray, "Eyes Open ", (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                ALARM_ON = False
+                self.ALARM_ON = False
 
             cv2.putText(gray, "EAR: {:.2f}".format(ear), (480, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
@@ -189,8 +190,8 @@ class MainScreen(Screen): #mainScreen subclass
                 self.yawns+=1
 
             if self.yawns >= 15:
-                if not ALARM_ON:
-                    ALARM_ON = True
+                if not self.ALARM_ON:
+                    self.ALARM_ON = True
                     t = Thread(target=self.sound_alarm,
                             args=('alarm.wav',))
                     t.deamon = True
