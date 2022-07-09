@@ -29,15 +29,6 @@ class MainScreen(Screen): #mainScreen subclass
         layout.cols =1
         self.img1 = Image(size_hint=(1,.9))
         layout.add_widget(self.img1)
-        # Button widget
-        button1 = Button(
-            text="Exit",
-            size_hint=(0.2,0.07),
-            pos_hint= {'center_x':0.5,'center_y':0.5},
-            background_color = '#1663e0',
-            on_press = self.callback
-            )
-        layout.add_widget(button1)
 
         predictor_path = 'shape_predictor_68_face_landmarks.dat'
         # define constants for aspect ratios
@@ -60,10 +51,6 @@ class MainScreen(Screen): #mainScreen subclass
         Clock.schedule_interval(self.update,1.0/33.0)
         self.add_widget(layout)
 
-
-    def callback(self, instance):
-        self.manager.current = 'welcomeScreen'
-        
 
     #calculating eye aspect ratio
     def eye_aspect_ratio(self,eye):
@@ -202,7 +189,6 @@ class MainScreen(Screen): #mainScreen subclass
                 break
 
             cv2.putText(gray, "MAR: {:.2f}".format(mouEAR), (480, 60),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-            # cv2.putText(frame,"Lusip Project @ Swarnim",(370,470),cv2.FONT_HERSHEY_COMPLEX,0.6,(153,51,102),1)
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop
             if key == ord("q"):
