@@ -1,12 +1,10 @@
-from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.uix.textinput import TextInput
-from kivy.uix.widget import Widget
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import Screen
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
 from numpy import source
@@ -29,6 +27,7 @@ class LoginScreen(Screen): #welcomeScreen subclass
                 size=self.size,
                 pos=self.pos
             )
+            
          #label widget for heading
         loginPage.add_widget(Image(source="icon.jpg"))
         heading = Label(
@@ -71,12 +70,11 @@ class LoginScreen(Screen): #welcomeScreen subclass
             multiline = False,
             font_size= 18,
             padding_y=(10,10),
-            size_hint=(1,0.5)
+            size_hint=(1,0.5),
+            password = True
             )
         pswdSection.add_widget(pswdInput)
         loginPage.add_widget(pswdSection)
-
-       
 
         buttonSection = BoxLayout()
         blank2 = Label(

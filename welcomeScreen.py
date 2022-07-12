@@ -50,12 +50,20 @@ class WelcomeScreen(Screen): #welcomeScreen subclass
             on_press = self.about
             )
         welcomePage.add_widget(button2)
+        # button3 = Button(
+        #     text="Stats",
+        #     size_hint=(0.4,0.3),
+        #     on_press = self.stats
+        #     )
+        # welcomePage.add_widget(button3)
         self.add_widget(welcomePage)
 
     def callback(self, instance):
         self.manager.current = 'mainScreen'
     def about(self, instance):
         self.manager.current = 'aboutScreen'
+    def stats(self, instance):
+        self.manager.current = 'statsScreen'
     def _update_rect(self, instance, value):
             self.rect.pos = instance.pos
             self.rect.size = instance.size

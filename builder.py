@@ -1,7 +1,6 @@
 # Kivy imports
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager
+from kivymd.app import MDApp
 
 #user defined classes import
 from loginScreen import LoginScreen
@@ -10,7 +9,7 @@ from aboutScreen import AboutScreen
 from mainScreen import MainScreen
 
 
-class BuilderApp(App): # display the welcome screen
+class BuilderApp(MDApp): # display the welcome screen
     def build(self):
         self.title = "Driver Drowsiness Detection System"
         sm = ScreenManager()

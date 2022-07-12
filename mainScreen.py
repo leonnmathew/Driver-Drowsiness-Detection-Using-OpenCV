@@ -1,17 +1,20 @@
 # Kivy imports
 from kivy.app import App
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.logger import Logger
+from kivymd.uix.datatables import MDDataTable
+from kivy.metrics import dp
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
 
 #opencv, imutils and other required imports
-from turtle import color
+from turtle import color, width
 from cv2 import rectangle
 from scipy.spatial import distance as dist
 from imutils import face_utils
@@ -22,13 +25,56 @@ import cv2
 import playsound
 from threading import Thread
 
+#MongoDB
+import pymongo
+from pymongo import MongoClient
+from datetime import date, timedelta, datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+
 class MainScreen(Screen): #mainScreen subclass
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs) #init parent
         layout = BoxLayout(orientation='vertical')
-        layout.cols =1
+        layout.cols = 1
         self.img1 = Image(size_hint=(1,.9))
         layout.add_widget(self.img1)
+
+        btnSection = FloatLayout(
+            size_hint=(1,0.1)
+        )
+        button1 = Button(
+            text="View Statistics ",
+            size_hint_y = None,
+            size_hint_x = None,
+            height = 50,
+            width = 200,
+            background_color = '#1663e0',
+            pos_hint ={"x":0.2,"bottom":1},
+            on_press = self.callback
+            )
+
+        button2 = Button(
+            text="Show Latest Visualization",
+            size_hint_y = None,
+            size_hint_x = None,
+            height = 50,
+            width = 200,
+            background_color = '#1663e0',
+            pos_hint ={"x":0.5,"bottom":1},
+            on_press = self.dataShow
+            )
+        btnSection.add_widget(button1)
+        btnSection.add_widget(button2)
+        layout.add_widget(btnSection)
+        
+        self.cluster = MongoClient("mongodb+srv://Shub:ydaFUqp90RymHLw9@cluster0.ceaym1j.mongodb.net/?retryWrites=true&w=majority")
+        self.db = self.cluster["test"]
+        self.collection = self.db["test"]
+        self.datestr= str(date.today())
+        self.countinstance = self.collection.count_documents({})
+        # self.dataViz()
+
 
         predictor_path = 'shape_predictor_68_face_landmarks.dat'
         # define constants for aspect ratios
@@ -51,7 +97,88 @@ class MainScreen(Screen): #mainScreen subclass
         Clock.schedule_interval(self.update,1.0/33.0)
         self.add_widget(layout)
 
+# ----------------------------------------- Mongo part -------------------------------------
+        #check current date with database
+    def checkDate(self):
+        bolleanval = False
+        NowDateDict={"date":self.datestr}
+        filterDate = self.collection.find({ "_id": self.countinstance - 1},{"date": 1, "_id": 0})
+        for c in filterDate:
+            if c == NowDateDict:
+                bolleanval = True
+                return bolleanval	    
+        return bolleanval
 
+    #Function That Create new post in Database
+    def newEntry(self):
+        self.collection.insert_one({"_id": self.countinstance, "date":self.datestr ,"eyes": 0, "yawn": 0})
+
+    #update the values in database
+    def updateData(self,incValue):
+        self.countinstance = self.collection.count_documents({})
+        if self.checkDate():
+            if(incValue=="eyes" and incValue=="yawn"):
+                self.collection.update_one({"_id": self.countinstance - 1},{"$inc": {"eyes": 1,"yawn": 1}})
+            if(incValue=="eyes"):
+                self.collection.update_one({"_id": self.countinstance - 1},{"$inc": {"eyes": 1}})
+            if(incValue=="yawn"):
+                self.collection.update_one({"_id": self.countinstance - 1},{"$inc": {"yawn": 1}})
+        else:
+            self.newEntry()
+        return 0
+
+    #for retriving data and for visualization
+    def fetchData(self,dataVar):
+        #no. of post is countinstance variable
+        dataDictVar = {}
+        dataList=[]
+        filterData = self.collection.find({ "_id": 0},{"eyes": 1, "_id": 0})
+        if(dataVar=="eyes"):
+            for i in range(0,self.countinstance):
+                filterData = self.collection.find({ "_id": i},{"eyes": 1, "_id": 0})
+                for j in filterData:
+                    dataDictVar = j
+        if(dataVar=="yawn"):
+            for i in range(0,self.countinstance):
+                filterData = self.collection.find({ "_id": i},{"yawn": 1, "_id": 0})
+                for j in filterData:
+                    dataDictVar = j
+        if(dataVar=="date"):
+            for i in range(0,self.countinstance):
+                filterData = self.collection.find({ "_id": i},{"date": 1, "_id": 0})
+                for j in filterData:
+                    dataDictVar = j
+        if(dataVar=="all"):
+            for i in range(0,self.countinstance):
+                filterData = self.collection.find({ "_id": i},{"date": 1, "eyes": 1, "yawn": 1 , "_id": 0})
+                for j in filterData:
+                    dataDictVar = j
+                    dataList.append(dataDictVar)
+        # print(dataDictVar)
+        print (dataList)
+        return dataList
+        
+    #for Visualization for the last Date Entry
+    def dataViz(self):
+        dataDictVar = {}
+        filterData = self.collection.find({})
+        for i in range(0,self.countinstance):
+            filterData = self.collection.find({"_id": i},{"_id": 0})
+            for j in filterData:
+                dataDictVar = j
+
+        x =dataDictVar["eyes"]
+        y = dataDictVar["yawn"]
+        z = dataDictVar["date"]
+        pd.DataFrame(dataDictVar, index=[0]).plot.bar()
+        plt.suptitle("Date: " + self.datestr)
+        plt.ylabel('Alarm')
+        plt.show()
+
+
+
+# ----------------------------------------- END -------------------------------------    
+    
     #calculating eye aspect ratio
     def eye_aspect_ratio(self,eye):
         # compute the euclidean distances between the vertical
@@ -147,6 +274,7 @@ class MainScreen(Screen): #mainScreen subclass
 
                     if not self.ALARM_ON:
                         self.ALARM_ON = True
+                        self.updateData("eyes")
                         t = Thread(target=self.sound_alarm,
                                 args=('alarm.wav',))
                         t.deamon = True
@@ -179,6 +307,7 @@ class MainScreen(Screen): #mainScreen subclass
             if self.yawns >= 15:
                 if not self.ALARM_ON:
                     self.ALARM_ON = True
+                    self.updateData("yawn")
                     t = Thread(target=self.sound_alarm,
                             args=('alarm.wav',))
                     t.deamon = True
@@ -194,3 +323,10 @@ class MainScreen(Screen): #mainScreen subclass
             if key == ord("q"):
                 break
         return gray
+
+    def callback(self,instance):
+        self.fetchData("all")
+
+    def dataShow(self,instance):
+        self.dataViz()
+
