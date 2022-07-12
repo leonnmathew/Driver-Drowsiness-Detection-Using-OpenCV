@@ -19,7 +19,7 @@ from cv2 import rectangle
 from scipy.spatial import distance as dist
 from imutils import face_utils
 import imutils
-import numpy 
+import pandas as pd
 import dlib
 import cv2
 import playsound
@@ -55,7 +55,7 @@ class MainScreen(Screen): #mainScreen subclass
             )
 
         button2 = Button(
-            text="Show Latest Visualization",
+            text="Show Visualization",
             size_hint_y = None,
             size_hint_x = None,
             height = 50,
@@ -161,18 +161,24 @@ class MainScreen(Screen): #mainScreen subclass
     #for Visualization for the last Date Entry
     def dataViz(self):
         dataDictVar = {}
+        dataList=[]
+        date =[]
         filterData = self.collection.find({})
         for i in range(0,self.countinstance):
             filterData = self.collection.find({"_id": i},{"_id": 0})
             for j in filterData:
                 dataDictVar = j
+                dataList.append(dataDictVar)
+                date.append(dataDictVar["date"])
 
-        x =dataDictVar["eyes"]
-        y = dataDictVar["yawn"]
-        z = dataDictVar["date"]
-        pd.DataFrame(dataDictVar, index=[0]).plot.bar()
-        plt.suptitle("Date: " + self.datestr)
-        plt.ylabel('Alarm')
+        
+        # x =dataDictVar["eyes"]
+        # y = dataDictVar["yawn"]
+        # z = dataDictVar["date"]
+        pd.DataFrame(dataList).plot.bar()
+        plt.suptitle("User Drowsiness Statistics" )
+        plt.ylabel('Eyes closed / Yawn Count')
+        plt.xlabel("Driver's Record")
         plt.show()
 
 
